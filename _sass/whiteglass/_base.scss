@@ -25,6 +25,10 @@ body {
   font-kerning: normal;
 }
 
+h1, h2, h3, h4, h5, h6 {
+  font: $base-font-weight #{$base-font-size}/#{$base-line-height} $titles-font-family;
+}
+
 table {
   width: 100%;
   margin: 0 0 20px 0;
@@ -48,7 +52,9 @@ ul, ol, dl, figure,
  */
 img {
   max-width: 100%;
-  vertical-align: middle;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 
@@ -119,10 +125,11 @@ a {
  */
 blockquote {
   color: $grey-color;
-  border-left: 4px solid $grey-color-light;
-  padding-left: $spacing-unit / 2;
-  font-size: 18px;
-  letter-spacing: -1px;
+  border-left: 4px solid $grey-color-dark;
+  padding-left: $spacing-unit;
+  margin-top: $spacing-unit;
+  margin-bottom: $spacing-unit;
+  font-size: 20px;
   font-style: italic;
 
   > :last-child {
@@ -150,7 +157,7 @@ hr {
 pre,
 code {
   font-family: $monospace-font-family;
-  font-size: 13px;
+  font-size: 14px;
   border: 1px solid $grey-color-light;
   border-radius: 0;
   background-color: lighten($grey-color-light, 5%);
