@@ -46,17 +46,17 @@ maven repository. Let's change the build to use our own Artifactory.
 The default (in case you don't use any custom maven server) is:
 
 {% highlight groovy %}
-    repositories {
-      mavenCentral()
-    }
+repositories {
+    mavenCentral()
+}
 {% endhighlight %}
 
 We need to change this to:
 
 {% highlight groovy %}
-    repositories {
-      maven { url 'http://localhost:8081/artifactory/repo' }
-    }
+repositories {
+    maven { url 'http://localhost:8081/artifactory/repo' }
+}
 {% endhighlight %}
 
 In case you're wondering where does that `repo` at the end of the URL come
@@ -183,22 +183,22 @@ Here's how to configure gradle to use the snapshots repository when you have
 `SNAPSHOT` versions:
 
 {% highlight groovy %}
-  group = 'io.igorpopov'
-  version = '1.0-SNAPSHOT'
+group = 'io.igorpopov'
+version = '1.0-SNAPSHOT'
 
-  publishing {
+publishing {
     publications { ... }
     repositories {
-      maven {
-        credentials { ... }
+        maven {
+            credentials { ... }
 
-        if (project.version.endsWith('-SNAPSHOT'))
-          url "http://localhost:8081/artifactory/libs-snapshot-local"
-        else
-          url "http://localhost:8081/artifactory/libs-release-local"
-      }
+            if (project.version.endsWith('-SNAPSHOT'))
+                url "http://localhost:8081/artifactory/libs-snapshot-local"
+            else
+                url "http://localhost:8081/artifactory/libs-release-local"
+        }
     }
-  }
+}
 {% endhighlight %}
 
 # Debugging
@@ -264,4 +264,3 @@ learn these things.
 - [What are virtual repositories?](http://www.jfrog.com/confluence/display/RTF/Virtual+Repositories)
 - [Publishing artifacts from Gradle](http://www.gradle.org/docs/current/userguide/publishing_maven.html)
 - [More details on how to publish artifacts](http://www.gradle.org/docs/current/dsl/org.gradle.api.publish.maven.MavenPublication.html)
-

@@ -89,34 +89,34 @@ In a few moments you'll have a phpmyadmin server running on: `http://192.168.33.
 Here's the puppet script that accomplishes what this post describes:
 
 {% highlight ruby %}
-    Exec { path => [ '/bin', '/sbin', '/usr/bin', '/usr/sbin', ] }
+Exec { path => [ '/bin', '/sbin', '/usr/bin', '/usr/sbin', ] }
 
-    exec { 'system-update':
-      command => 'sudo apt-get update',
-    }
+exec { 'system-update':
+  command => 'sudo apt-get update',
+}
 
-    Exec['system-update'] -> Package <| |>
+Exec['system-update'] -> Package <| |>
 
-    package { 'phpmyadmin':
-      ensure => present,
-    }
+package { 'phpmyadmin':
+  ensure => present,
+}
 
-    # linux way: ln -s /etc/phpmyadmin/apache.conf /etc/apache2/sites-available/phpmyadmin.conf
-    file { '/etc/apache2/sites-available/phpmyadmin.conf':
-      ensure => link,
-      target => '/etc/phpmyadmin/apache.conf',
-      require => Package['phpmyadmin'],
-    }
+# linux way: ln -s /etc/phpmyadmin/apache.conf /etc/apache2/sites-available/phpmyadmin.conf
+file { '/etc/apache2/sites-available/phpmyadmin.conf':
+  ensure => link,
+  target => '/etc/phpmyadmin/apache.conf',
+  require => Package['phpmyadmin'],
+}
 
-    exec { 'enable-phpmyadmin':
-      command => 'sudo a2ensite phpmyadmin.conf',
-      require => File['/etc/apache2/sites-available/phpmyadmin.conf'],
-    }
+exec { 'enable-phpmyadmin':
+  command => 'sudo a2ensite phpmyadmin.conf',
+  require => File['/etc/apache2/sites-available/phpmyadmin.conf'],
+}
 
-    exec { 'restart-apache':
-      command => 'sudo /etc/init.d/apache2 restart',
-      require => Exec['enable-phpmyadmin'],
-    }
+exec { 'restart-apache':
+  command => 'sudo /etc/init.d/apache2 restart',
+  require => Exec['enable-phpmyadmin'],
+}
 {% endhighlight %}
 
 

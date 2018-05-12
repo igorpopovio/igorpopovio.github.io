@@ -14,29 +14,29 @@ You can either scroll down or download the C# version of the code.
 It's about this code:
 
 {% highlight csharp %}
-    // MainWindow.xaml.cs
-    private void ShowOnlyBargainsFilter(object sender, FilterEventArgs e)
+// MainWindow.xaml.cs
+private void ShowOnlyBargainsFilter(object sender, FilterEventArgs e)
+{
+    AuctionItem product = e.Item as AuctionItem;
+    if (product != null)
     {
-        AuctionItem product = e.Item as AuctionItem;
-        if (product != null)
+        // Filter out products with price 25 or above
+        if (product.CurrentPrice < 25)
         {
-            // Filter out products with price 25 or above
-            if (product.CurrentPrice < 25)
-            {
-                e.Accepted = true;
-            }
-            else
-            {
-                e.Accepted = false;
-            }
+            e.Accepted = true;
+        }
+        else
+        {
+            e.Accepted = false;
         }
     }
+}
 {% endhighlight %}
 
 The entire inner if statement can be reduced to:
 
 {% highlight csharp %}
-    e.Accepted = product.CurrentPrice < 25;
+e.Accepted = product.CurrentPrice < 25;
 {% endhighlight %}
 
 This reads very well in *plain english* (unlike the original version which is
@@ -46,12 +46,12 @@ This reads very well in *plain english* (unlike the original version which is
 Actually, the whole method can be rewritten as:
 
 {% highlight csharp %}
-    // MainWindow.xaml.cs
-    private void ShowOnlyBargainsFilter(object sender, FilterEventArgs e)
-    {
-        AuctionItem product = e.Item as AuctionItem;
-        if (product != null) e.Accepted = product.CurrentPrice < 25;
-    }
+// MainWindow.xaml.cs
+private void ShowOnlyBargainsFilter(object sender, FilterEventArgs e)
+{
+    AuctionItem product = e.Item as AuctionItem;
+    if (product != null) e.Accepted = product.CurrentPrice < 25;
+}
 {% endhighlight %}
 
 This is only 5 lines of code, unlike the original version which is 16 lines of
@@ -69,18 +69,18 @@ This is called the [*tell, don't ask! principle*](http://martinfowler.com/bliki/
 Here's how I would do it:
 
 {% highlight csharp %}
-    // MainWindow.xaml.cs
-    private void ShowOnlyBargainsFilter(object sender, FilterEventArgs e)
-    {
-        AuctionItem product = e.Item as AuctionItem;
-        if (product != null) e.Accepted = product.IsBargain();
-    }
+// MainWindow.xaml.cs
+private void ShowOnlyBargainsFilter(object sender, FilterEventArgs e)
+{
+    AuctionItem product = e.Item as AuctionItem;
+    if (product != null) e.Accepted = product.IsBargain();
+}
 
-    // AuctionItem.cs
-    public bool IsBargain()
-    {
-        return CurrentPrice < 25;
-    }
+// AuctionItem.cs
+public bool IsBargain()
+{
+    return CurrentPrice < 25;
+}
 {% endhighlight %}
 
 This type of logic should be in the *domain model*, not in the user interface as
@@ -93,46 +93,46 @@ The examples are in java, but it shouldn't matter.
 
 [*Don't compare a boolean with true!*](http://programmers.stackexchange.com/a/12828/3704) It is already true!
 {% highlight java %}
-    // bad way
-    if (something == true) doThis();
+// bad way
+if (something == true) doThis();
 
-    // good way
-    if (something) doThis();
+// good way
+if (something) doThis();
 
-    // even better: rename the boolean so it reads like English
-    if (isSomething) doThis();
+// even better: rename the boolean so it reads like English
+if (isSomething) doThis();
 
-    // good examples: isBargain, isValid, isFile, exists, shouldReceiveBonus
+// good examples: isBargain, isValid, isFile, exists, shouldReceiveBonus
 {% endhighlight %}
 
 Same goes for false:
 {% highlight java %}
-    // bad way
-    if (something == false) doThat();
+// bad way
+if (something == false) doThat();
 
-    // good way
-    if (!something) doThat();
+// good way
+if (!something) doThat();
 {% endhighlight %}
 
 Other programmers have an urge to check the boolean when returning from a function.
 {% highlight java %}
-    // bad way
-    if (condition)
-        return true;
-    else
-        return false;
+// bad way
+if (condition)
+    return true;
+else
+    return false;
 
-    // good way
-    return condition;
+// good way
+return condition;
 {% endhighlight %}
 
 Some other programmers use the ternary operator:
 {% highlight java %}
-    // bad way
-    boolean active = userDisabled? false : true;
+// bad way
+boolean active = userDisabled? false : true;
 
-    // good way
-    boolean active = !userDisabled;
+// good way
+boolean active = !userDisabled;
 {% endhighlight %}
 
 And finally: don't *EVER* use booleans as parameters to a function. This
@@ -145,15 +145,15 @@ other for false. If you didn't know about the Single Responsibility Principle,
 
 Here are some examples:
 {% highlight java %}
-    // bad way
-    setVisible(true);
-    setVisible(false);
+// bad way
+setVisible(true);
+setVisible(false);
 
-    // good way
-    show();
-    hide();
+// good way
+show();
+hide();
 
-    // other good examples: enable/disable, switchOn/switchOff
+// other good examples: enable/disable, switchOn/switchOff
 {% endhighlight %}
 
 # Tips and Tricks
@@ -181,4 +181,3 @@ code they use as examples (unlike Microsoft in this case).
 *What type of code YOU want to promote?*
 Don't forget that it always backfires and you end up working with people that
 will write the same kind of code.
-

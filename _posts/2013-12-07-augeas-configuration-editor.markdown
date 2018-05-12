@@ -79,12 +79,12 @@ can have lenses for pretty much anything: cron, grub, hosts, mysql, passwd,
 If you happen to use puppet, here's how to do it:
 
 {% highlight ruby %}
-    augeas { 'display_errors':
-      context => '/files/etc/php5/apache2/php.ini',
-      changes => [
-        'set PHP/display_errors On',
-      ]
-    }
+augeas { 'display_errors':
+  context => '/files/etc/php5/apache2/php.ini',
+  changes => [
+    'set PHP/display_errors On',
+  ]
+}
 {% endhighlight %}
 
 ## More information
@@ -93,4 +93,3 @@ You can read more about augeas on the official website (although I didn't find
     it particularly informative) and on this page that actually contains really
 good information: [*Augeas puppet
 documentation*](http://projects.puppetlabs.com/projects/1/wiki/puppet_augeas).
-

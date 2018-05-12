@@ -50,27 +50,27 @@ Create a directory called `provisioning` so everything stays nicely grouped
 together. Create a `Vagrantfile` with the following contents:
 
 {% highlight ruby %}
-  Vagrant.configure('2') do |config|
-    config.vm.box = 'precise32'
-    config.vm.box_url = 'http://files.vagrantup.com/precise32.box'
+Vagrant.configure('2') do |config|
+  config.vm.box = 'precise32'
+  config.vm.box_url = 'http://files.vagrantup.com/precise32.box'
 
-    config.vm.define :node do |node|
-      node.vm.hostname = 'node'
-      node.vm.network :private_network, ip: '192.168.33.10'
-      node.vm.synced_folder '../', '/var/www/vagrant'
-      node.vm.provision :puppet do |puppet|
-        puppet.module_path = [
-          'modules/third-party',
-          'modules/main',
-        ]
-        puppet.manifests_path = 'manifests'
-        puppet.manifest_file = 'node.pp'
-        puppet.facter = {
-          'fqdn' => 'node.igorpopov.me'
-        }
-      end
+  config.vm.define :node do |node|
+    node.vm.hostname = 'node'
+    node.vm.network :private_network, ip: '192.168.33.10'
+    node.vm.synced_folder '../', '/var/www/vagrant'
+    node.vm.provision :puppet do |puppet|
+      puppet.module_path = [
+        'modules/third-party',
+        'modules/main',
+      ]
+      puppet.manifests_path = 'manifests'
+      puppet.manifest_file = 'node.pp'
+      puppet.facter = {
+        'fqdn' => 'node.igorpopov.me'
+      }
     end
   end
+end
 {% endhighlight %}
 
 The `Vagrantfile` is just a ruby script with some DSL (Domain Specific
@@ -114,10 +114,10 @@ third-party modules we need for our project...
 Create a `Puppetfile` with the following contents:
 
 {% highlight ruby %}
-    forge 'http://forge.puppetlabs.com'
+forge 'http://forge.puppetlabs.com'
 
-    mod 'puppetlabs/apache'
-    mod 'example42/php'
+mod 'puppetlabs/apache'
+mod 'example42/php'
 {% endhighlight %}
 
 We will use *librarian-puppet* to manage all the third party modules.
@@ -183,35 +183,35 @@ becomes:
 Next we need to create the `provision/manifests/node.pp` file:
 
 {% highlight ruby %}
-  Exec { path => [ '/bin', '/sbin', '/usr/bin', '/usr/sbin' ] }
+Exec { path => [ '/bin', '/sbin', '/usr/bin', '/usr/sbin' ] }
 
-  exec { 'system-update':
-    command => 'sudo apt-get update'
-  }
+exec { 'system-update':
+  command => 'sudo apt-get update'
+}
 
-  Exec['system-update'] -> Package <| |>
+Exec['system-update'] -> Package <| |>
 
-  package {
-    [ 'tree', 'git', 'vim', 'augeas-tools' ]:
-    ensure => present,
-  }
+package {
+  [ 'tree', 'git', 'vim', 'augeas-tools' ]:
+  ensure => present,
+}
 
-  user { 'igor': 
-    ensure => present,
-  }
+user { 'igor': 
+  ensure => present,
+}
 
-  class { 'apache':
-    mpm_module => 'prefork',
-  }
+class { 'apache':
+  mpm_module => 'prefork',
+}
 
-  apache::vhost { $fqdn:
-    priority => 14,
-    port => 80,
-    docroot => '/var/www/vagrant/labs',
-  }
+apache::vhost { $fqdn:
+  priority => 14,
+  port => 80,
+  docroot => '/var/www/vagrant/labs',
+}
 
-  include apache::mod::php
-  include php
+include apache::mod::php
+include php
 {% endhighlight %}
 
 
@@ -222,7 +222,7 @@ commands. If we don’t do it here, we’ll need to prefix each command with it�
 path and that’s not so nice...
 
 {% highlight ruby %}
-  Exec { path => ['/bin', '/sbin', '/usr/bin', '/usr/sbin'] }
+Exec { path => ['/bin', '/sbin', '/usr/bin', '/usr/sbin'] }
 {% endhighlight %}
 
 
@@ -233,10 +233,10 @@ important ones are exec, package and service. All the resources have the
 following format:
 
 {% highlight ruby %}
-  resource-type { 'custom-resource-name':
-    key1 => 'value1',
-    key2 => 'value2',
-  }
+resource-type { 'custom-resource-name':
+  key1 => 'value1',
+  key2 => 'value2',
+}
 {% endhighlight %}
 
 
@@ -246,16 +246,16 @@ The exec resource is used to tell puppet to execute a shell command on the
 virtual machine.
 
 {% highlight ruby %}
-  exec { 'system-update':
-    command => 'sudo apt-get update'
-  }
+exec { 'system-update':
+  command => 'sudo apt-get update'
+}
 {% endhighlight %}
 
 The next thing tells puppet that before installing any package it should first
 update the list of packages available:
 
 {% highlight ruby %}
-  Exec['system-update'] -> Package <| |>
+Exec['system-update'] -> Package <| |>
 {% endhighlight %}
 
 
@@ -264,18 +264,18 @@ update the list of packages available:
 Now we tell puppet that we want a list of packages installed:
 
 {% highlight ruby %}
-  package {
-    [ 'tree', 'git', 'vim', 'augeas-tools' ]:
-    ensure => present,
-  }
+package {
+  [ 'tree', 'git', 'vim', 'augeas-tools' ]:
+  ensure => present,
+}
 {% endhighlight %}
 
 Let's also create a new user, just for fun :)
 
 {% highlight ruby %}
-  user { 'igor': 
-    ensure => present,
-  }
+user { 'igor': 
+  ensure => present,
+}
 {% endhighlight %}
 
 See? It was pretty simple, huh?
@@ -295,23 +295,22 @@ Remember that we configured a `synced_folder` in the Vagrantfile? This is where
 we'll use it. As the docroot for the current vhost.
 
 {% highlight ruby %}
-  class { 'apache':
-    mpm_module => 'prefork',
-  }
+class { 'apache':
+  mpm_module => 'prefork',
+}
 
-  apache::vhost { $fqdn:
-    priority => 14,
-    port => 80,
-    docroot => '/var/www/vagrant/labs',
-  }
-
+apache::vhost { $fqdn:
+  priority => 14,
+  port => 80,
+  docroot => '/var/www/vagrant/labs',
+}
 {% endhighlight %}
 
 Next, we need to activate the php module in apache and also include the php puppet module in the current script:
 
 {% highlight ruby %}
-  include apache::mod::php
-  include php
+include apache::mod::php
+include php
 {% endhighlight %}
 
 
@@ -327,9 +326,9 @@ provision it using the `node.pp` script I have described.
 Ok, now add a `index.php` file with the following content:
 
 {% highlight php %}
-  <?php
-  phpinfo();
-  ?>
+<?php
+phpinfo();
+?>
 {% endhighlight %}
 
 To check if everything is alright (in case you didn't have errors from vagrant
@@ -364,4 +363,3 @@ I will also post somewhere the final video with me doing the kata.
 
 Well, if you're still reading, this concludes the explanations. If you have
 questions you can comment and ask clarifications.
-

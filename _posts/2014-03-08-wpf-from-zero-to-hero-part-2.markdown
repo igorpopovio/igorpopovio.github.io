@@ -34,14 +34,14 @@ didn't quite like the name. It's not very consistent with what WPF offers. So,
 Here's the code:
 
 {% highlight csharp %}
-    public class ObservableObject : INotifyPropertyChanged
+public class ObservableObject : INotifyPropertyChanged
+{
+    public event PropertyChangedEventHandler PropertyChanged = delegate { };
+    public void RaiseOnPropertyChanged(string propertyName)
     {
-        public event PropertyChangedEventHandler PropertyChanged = delegate { };
-        public void RaiseOnPropertyChanged(string propertyName)
-        {
-            PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-        }
+        PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
     }
+}
 {% endhighlight %}
 
 ## The ViewModel
@@ -49,37 +49,37 @@ Here's the code:
 The next thing is the `ViewModel` which needs to extend the `ObservableObject`:
 
 {% highlight csharp %}
-    namespace DiagnoseTry2_WithMvc
+namespace DiagnoseTry2_WithMvc
+{
+    public class ViewModel : ObservableObject
     {
-        public class ViewModel : ObservableObject
+        private string message;
+        public string Message
         {
-            private string message;
-            public string Message
+            get { return message; }
+            set
             {
-                get { return message; }
-                set
-                {
-                    message = value;
-                    RaiseOnPropertyChanged("Message");
-                }
+                message = value;
+                RaiseOnPropertyChanged("Message");
             }
-            // other code
         }
+        // other code
     }
+}
 {% endhighlight %}
 
 Here's how we connect the `ViewModel` to the view:
 
 {% highlight xml %}
-    <Window 
-            ...
-            xmlns:src="clr-namespace:DiagnoseTry2_WithMvc"
-            >
+<Window 
+        ...
+        xmlns:src="clr-namespace:DiagnoseTry2_WithMvc"
+        >
 
-        <Window.DataContext>
-            <src:ViewModel/>
-        </Window.DataContext>
-    </Window>
+    <Window.DataContext>
+        <src:ViewModel/>
+    </Window.DataContext>
+</Window>
 {% endhighlight %}
 
 When someone updates the `Message` property, the subscribers (in this case the
@@ -89,7 +89,7 @@ When someone updates the `Message` property, the subscribers (in this case the
   on this line:
 
 {% highlight xml %}
-    <TextBlock Text="{Binding Message}"/>
+<TextBlock Text="{Binding Message}"/>
 {% endhighlight %}
 
 I won't go into details on how the `Items` are implemented since they are very
@@ -99,7 +99,7 @@ similar to the normal `Message`. The only differences are:
 - the binding is done like this:
 
 {% highlight xml %}
-    <ListBox ItemsSource="{Binding Items}" />
+<ListBox ItemsSource="{Binding Items}" />
 {% endhighlight %}
 
 The next step is to actually show something in the GUI. For this we just add
@@ -107,13 +107,13 @@ some items in the constructor. I know this is not the normal way, but I prefer
 using simpler methods while I'm learning till I get all the moving parts.
 
 {% highlight csharp %}
-    public ViewModel()
-    {
-        Items = new ObservableCollection<Item>();
-        Items.Add(new Item() { Name = "first item name", Description = "first item description" });
-        Items.Add(new Item() { Name = "second item name", Description = "second item description" });
-        Message = "There are " + items.Count + " items";
-    }
+public ViewModel()
+{
+    Items = new ObservableCollection<Item>();
+    Items.Add(new Item() { Name = "first item name", Description = "first item description" });
+    Items.Add(new Item() { Name = "second item name", Description = "second item description" });
+    Message = "There are " + items.Count + " items";
+}
 {% endhighlight %}
 
 # Resources

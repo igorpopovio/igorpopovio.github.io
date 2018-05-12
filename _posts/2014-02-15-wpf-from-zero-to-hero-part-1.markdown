@@ -88,10 +88,10 @@ Now, at least, I know I got the layout right and it works outside of Telerik.
 Here's the part that creates the (future) item template:
 
 {% highlight xml %}
-    <StackPanel Orientation="Vertical" Background="Green" Margin="10">
-        <TextBlock Text="{Binding Name}" FontSize="18" Background="Yellow"/>
-        <TextBlock Text="{Binding Description}" FontSize="12" Background="Orange"/>
-    </StackPanel>
+<StackPanel Orientation="Vertical" Background="Green" Margin="10">
+    <TextBlock Text="{Binding Name}" FontSize="18" Background="Yellow"/>
+    <TextBlock Text="{Binding Description}" FontSize="12" Background="Orange"/>
+</StackPanel>
 {% endhighlight %}
 
 This code also contains the data binding part which seems to use it's [own
@@ -106,14 +106,14 @@ in understanding how everything fits together.
 The next step is to create the data template for one item.
 
 {% highlight xml %}
-    <Window.Resources>
-        <DataTemplate x:Key="itemTemplate" DataType="src:Item">
-            <StackPanel Orientation="Vertical" Background="Green" Margin="10">
-                <TextBlock Text="{Binding Name}" FontSize="18" Background="Yellow"/>
-                <TextBlock Text="{Binding Description}" FontSize="12" Background="Orange"/>
-            </StackPanel>
-        </DataTemplate>
-    </Window.Resources>
+<Window.Resources>
+    <DataTemplate x:Key="itemTemplate" DataType="src:Item">
+        <StackPanel Orientation="Vertical" Background="Green" Margin="10">
+            <TextBlock Text="{Binding Name}" FontSize="18" Background="Yellow"/>
+            <TextBlock Text="{Binding Description}" FontSize="12" Background="Orange"/>
+        </StackPanel>
+    </DataTemplate>
+</Window.Resources>
 {% endhighlight %}
 
 The basic idea is to put the DataTemplate in the resources part of the
@@ -122,7 +122,7 @@ application. I saw in some examples that people put these in a separate file,
       project anyway).
 
 {% highlight xml %}
-    <DataTemplate x:Key="itemTemplate" DataType="src:Item">
+<DataTemplate x:Key="itemTemplate" DataType="src:Item">
 {% endhighlight %}
 
 The `x:key` part is used to give an identifier for the DataTemplate so you can
@@ -141,33 +141,31 @@ reference classes inside that namespace using this syntax: `src:Item`.
 Here are all the puzzle pieces:
 
 {% highlight xml %}
-   <!-- MainWindow.xaml -->
-   <Window x:Class="DiagnoseTry1.MainWindow"
-          xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-          xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-          xmlns:src="clr-namespace:DiagnoseTry1"
-          Title="MainWindow" Height="350" Width="525">
-
-      <!-- other code -->
-
-  </Window>
+<!-- MainWindow.xaml -->
+<Window x:Class="DiagnoseTry1.MainWindow"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:src="clr-namespace:DiagnoseTry1"
+      Title="MainWindow" Height="350" Width="525">
+<!-- other code -->
+</Window>
 {% endhighlight %}
 
 {% highlight csharp %}
-    // Item.cs
-    namespace DiagnoseTry1
+// Item.cs
+namespace DiagnoseTry1
+{
+    public class Item
     {
-        public class Item
-        {
-          // more code
-        }
+      // more code
     }
+}
 {% endhighlight %}
 
 That's why the `DataType="src:Item"` part works:
 
 {% highlight xml %}
-    <DataTemplate x:Key="itemTemplate" DataType="src:Item">
+<DataTemplate x:Key="itemTemplate" DataType="src:Item">
 {% endhighlight %}
 
 Oh, by the way, in case you're wondering: *CLR* is the [Common Language
@@ -185,10 +183,10 @@ And now here's the part that uses the `DataTemplate`:
 `ItemTemplate="{StaticResource itemTemplate}"`:
 
 {% highlight xml %}
-    <ListBox x:Name="ItemListBox" Width="400" Margin="10"
-             ItemsSource="{Binding items}"
-             ItemTemplate="{StaticResource itemTemplate}">
-    </ListBox>
+<ListBox x:Name="ItemListBox" Width="400" Margin="10"
+         ItemsSource="{Binding items}"
+         ItemTemplate="{StaticResource itemTemplate}">
+</ListBox>
 {% endhighlight %}
 
 Now follows the part where I couldn't find more walls where to bang my head.
@@ -198,32 +196,32 @@ without a *DataContext*. What follows is a *hack* due to not having enough
 knowledge to do it the right way in this post.
 
 {% highlight csharp %}
-    public partial class MainWindow : Window
-    {
-        public List<Item> items { get; set; }
+public partial class MainWindow : Window
+{
+    public List<Item> items { get; set; }
 
-        public MainWindow()
-        {
-            InitializeComponent();
-            items = GetItems();
-            DataContext = this;
-        }
+    public MainWindow()
+    {
+        InitializeComponent();
+        items = GetItems();
+        DataContext = this;
     }
+}
 {% endhighlight %}
 
 Normally the `DataContext` should be set in XAML code, but this doesn't work in
 `MainWindow.xaml` (it [causes a StackOverflow exception](http://stackoverflow.com/a/15205381/354009)):
 
 {% highlight xml %}
-    <Window.DataContext>
-        <src:MainWindow/>
-    </Window.DataContext>
+<Window.DataContext>
+    <src:MainWindow/>
+</Window.DataContext>
 {% endhighlight %}
 
 If I set the `DataContext` from the C# code then it works:
 
 {% highlight csharp %}
-    DataContext = this;
+DataContext = this;
 {% endhighlight %}
 
 After reading the explanation from the above mentioned StackOverflow post I

@@ -29,15 +29,15 @@ dependency for the test code.
 This is how the build script would look like:
 
 {% highlight groovy %}
-    apply plugin: 'java'
+apply plugin: 'java'
 
-    repositories {
-      mavenCentral()
-    }
+repositories {
+    mavenCentral()
+}
 
-    dependencies {
-      testCompile 'junit:junit:4.11'
-    }
+dependencies {
+    testCompile 'junit:junit:4.11'
+}
 {% endhighlight %}
 
 Basically, what's happening here is that you add the java plugin that
@@ -86,22 +86,22 @@ Here's how to make that `testCompile` thing - add the following code to
 `build.gradle` and run it with `./gradle -q`:
 
 {% highlight groovy %}
-    class DependencySpec {
-      def testCompile(String libraryIdentifier) {
+class DependencySpec {
+    def testCompile(String libraryIdentifier) {
         println "Adding the $libraryIdentifier library..."
-      }
     }
+}
 
-    def dependencies2(Closure configurationClosure) {
-      def dependencySpec = new DependencySpec()
-      configurationClosure.delegate = dependencySpec
-      configurationClosure.resolveStrategy = Closure.DELEGATE_FIRST
-      configurationClosure()
-    }
+def dependencies2(Closure configurationClosure) {
+    def dependencySpec = new DependencySpec()
+    configurationClosure.delegate = dependencySpec
+    configurationClosure.resolveStrategy = Closure.DELEGATE_FIRST
+    configurationClosure()
+}
 
-    dependencies2 {
-      testCompile 'junit:junit:4.11'
-    }
+dependencies2 {
+    testCompile 'junit:junit:4.11'
+}
 {% endhighlight %}
 
 Ok, so I'll take you through all the above code, since it's quite a lot to take
@@ -122,9 +122,9 @@ everything works.
 Let's start from the `dependencies2` method call:
 
 {% highlight groovy %}
-    dependencies2 {
-      testCompile 'junit:junit:4.11'
-    }
+dependencies2 {
+    testCompile 'junit:junit:4.11'
+}
 {% endhighlight %}
 
 It may not seem a method call, since in java you have to put parenthesis like
@@ -140,8 +140,8 @@ Well, let's rewrite that section of the code without using Groovy
 magic/syntactic sugar so it's a bit more clear.
 
 {% highlight groovy %}
-    Closure configurationClosure = { testCompile 'junit:junit:4.11' }
-    dependencies2(configurationClosure)
+Closure configurationClosure = { testCompile 'junit:junit:4.11' }
+dependencies2(configurationClosure)
 {% endhighlight %}
 
 Now you can clearly see that we have a method call. What about the
@@ -152,11 +152,11 @@ Now, to understand how it's possible to call the `testCompile` method even
 though it's in another class let's review the first part:
 
 {% highlight groovy %}
-    class DependencySpec {
-      def testCompile(String libraryIdentifier) {
+class DependencySpec {
+    def testCompile(String libraryIdentifier) {
         println "Adding the $libraryIdentifier library..."
-      }
     }
+}
 {% endhighlight %}
 
 First, you define a new Groovy class that has the code you need, `testCompile`
@@ -164,12 +164,12 @@ in our case. Then you define a new `dependencies2` method that receives a
 closure as an argument.
 
 {% highlight groovy %}
-    def dependencies2(Closure configurationClosure) {
-      def dependencySpec = new DependencySpec()
-      configurationClosure.delegate = dependencySpec
-      configurationClosure.resolveStrategy = Closure.DELEGATE_FIRST
-      configurationClosure()
-    }
+def dependencies2(Closure configurationClosure) {
+    def dependencySpec = new DependencySpec()
+    configurationClosure.delegate = dependencySpec
+    configurationClosure.resolveStrategy = Closure.DELEGATE_FIRST
+    configurationClosure()
+}
 {% endhighlight %}
 
 Now you need to understand one cool thing about closures: you can "delegate"
@@ -186,4 +186,3 @@ the key to understanding Gradle and getting to a productive level with it.
 
 You can read more about [Groovy closures](http://groovy.codehaus.org/Closures)
 to get a better understanding.
-

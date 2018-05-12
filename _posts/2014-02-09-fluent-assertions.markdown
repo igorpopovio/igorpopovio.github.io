@@ -18,11 +18,11 @@ we're not going to write any implementation code; we'll just use a library for
 the actual conversion (jscience).                                   
 
 {% highlight java %}
-    private double convert(double value, String fromUnit, String toUnit) {
-        return Unit.valueOf(fromUnit)
-                .getConverterTo(Unit.valueOf(toUnit))
-                .convert(value);
-    }
+private double convert(double value, String fromUnit, String toUnit) {
+    return Unit.valueOf(fromUnit)
+            .getConverterTo(Unit.valueOf(toUnit))
+            .convert(value);
+}
 {% endhighlight %}
 
 # Normal way
@@ -31,19 +31,19 @@ This is how we would normally write the tests. Just use the standard junit
 asserts.
 
 {% highlight java %}
-    public static final double DELTA = .01;
+public static final double DELTA = .01;
 
-    @Test
-    public void normalAsserts() throws Exception {
-        double actualKilometres = convert(1000, "m", "km");
-        assertEquals(1, actualKilometres, DELTA);
+@Test
+public void normalAsserts() throws Exception {
+    double actualKilometres = convert(1000, "m", "km");
+    assertEquals(1, actualKilometres, DELTA);
 
-        double actualPounds = convert(1, "t", "lb");
-        assertEquals(2204.62, actualPounds, DELTA);
+    double actualPounds = convert(1, "t", "lb");
+    assertEquals(2204.62, actualPounds, DELTA);
 
-        double actualGallons = convert(10, "L", "gal");
-        assertEquals(2.64, actualGallons, DELTA);
-    }
+    double actualGallons = convert(10, "L", "gal");
+    assertEquals(2.64, actualGallons, DELTA);
+}
 {% endhighlight %}
 
 # Improved way
@@ -53,18 +53,18 @@ and maintainability. One method of doing this is to make the tests describe as
 close as possible to English the behaviour we want to test.
 
 {% highlight java %}
-    @Test
-    public void improvedAsserts() throws Exception {
-        assertThat(1000, "m").equals(1, "km");
-        assertThat(1, "t").equals(2204.62, "lb");
-        assertThat(10, "L").equals(2.64, "gal");
-    }
+@Test
+public void improvedAsserts() throws Exception {
+    assertThat(1000, "m").equals(1, "km");
+    assertThat(1, "t").equals(2204.62, "lb");
+    assertThat(10, "L").equals(2.64, "gal");
+}
 {% endhighlight %}
 
 Let's take a closer look at one of the asserts:
 
 {% highlight java %}
-    assertThat(1000, "m").equals(1, "km");
+assertThat(1000, "m").equals(1, "km");
 {% endhighlight %}
 
 ![Readable tests](/images/fluent-assertions-readable-tests.png)
@@ -81,25 +81,25 @@ The basic idea is to create a method `assertThat` that returns a new
 ConversionAssert and contains a method that does the actual verification.
 
 {% highlight java %}
-    private ConversionAssert assertThat(double value, String fromUnit) {
-        return new ConversionAssert(value, fromUnit);
+private ConversionAssert assertThat(double value, String fromUnit) {
+    return new ConversionAssert(value, fromUnit);
+}
+
+private class ConversionAssert {
+    private final double value;
+    private final String fromUnit;
+
+    public ConversionAssert(double value, String fromUnit) {
+        this.value = value;
+        this.fromUnit = fromUnit;
     }
 
-    private class ConversionAssert {
-        private final double value;
-        private final String fromUnit;
-
-        public ConversionAssert(double value, String fromUnit) {
-            this.value = value;
-            this.fromUnit = fromUnit;
-        }
-
-        public void equals(double expected, String toUnit) {
-            double actual = convert(value, fromUnit, toUnit);
-            String message = String.format("conversion from %f %s to %s", value, fromUnit, toUnit);
-            assertEquals(message, expected, actual, DELTA);
-        }
+    public void equals(double expected, String toUnit) {
+        double actual = convert(value, fromUnit, toUnit);
+        String message = String.format("conversion from %f %s to %s", value, fromUnit, toUnit);
+        assertEquals(message, expected, actual, DELTA);
     }
+}
 {% endhighlight %}
 
 # Resources
@@ -107,4 +107,3 @@ ConversionAssert and contains a method that does the actual verification.
 - [Full example on Github](https://github.com/sensui/fluent-assertions-example)
 - [Write Maintainable Unit Tests That Will Save You Time And Tears](http://msdn.microsoft.com/en-us/magazine/cc163665.aspx)
 - [FEST Assertions](https://github.com/alexruiz/fest-assert-2.x/wiki/One-minute-starting-guide)
-
