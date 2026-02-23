@@ -25,7 +25,7 @@ github_username:  igorpopovio
 
 # Build settings
 markdown: kramdown
-theme: jekyll-whiteglass
+theme: minima
 plugins:
   - jekyll-feed
   - jekyll-archives
